@@ -1,6 +1,6 @@
-# RyanAntiMove
+# 10Pro
 Vencord Anti Move Plugin
-# 🛡️ RyanAntiMove (Vencord Plugin)
+# 🛡️ 10Pro (Vencord Plugin)
 
 بلوقن حماية متكامل لـ Vencord يمنع أي شخص من سحبك من الرومات الصوتية.
 
