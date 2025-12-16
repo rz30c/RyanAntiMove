@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 /**
- * @name RyanGuard PRO
+ * @name 1 0 Pro
  * @description Full protection + instant return + message to anyone who tries to pull you
  * @version 2.0.0
  */
@@ -14,13 +14,13 @@ import { definePluginSettings } from "@api/Settings";
 import { ApplicationCommandInputType } from "@api/Commands";
 import { findByProps } from "@webpack";
 
-/* ================== STORES ================== */
+/* ========== STORES ========== */
 const VoiceActions = findByProps("selectVoiceChannel");
 const UserStore = findByProps("getCurrentUser");
 const DMUtils = findByProps("openPrivateChannel");
 const RelationshipStore = findByProps("addRelationship");
 
-/* ================== SETTINGS ================== */
+/* ========== SETTINGS ========== */
 const settings = definePluginSettings({
     antiMove: { type: "boolean", description: "منع السحب", default: true },
     notifySound: { type: "boolean", description: "صوت تنبيه", default: true },
@@ -31,11 +31,11 @@ const settings = definePluginSettings({
     ignoredUsers: { type: "string", description: "IDs متجاهلة", default: "" }
 });
 
-/* ================== STATE ================== */
+/* ========== STATE ========== */
 let lastVoiceChannelId: string | null = null;
 const attempts: Record<string, number> = {};
 
-/* ================== UI ================== */
+/* ========== UI ========== */
 function overlay(text: string) {
     const el = document.createElement("div");
     el.textContent = text;
@@ -55,17 +55,17 @@ function overlay(text: string) {
     setTimeout(() => el.remove(), 4500);
 }
 
-/* ================== PLUGIN ================== */
+/* ========== PLUGIN ========== */
 export default definePlugin({
-    name: "RyanAntiMove",
+    name: "10AntiMove",
     description: "حماية كاملة من سحب الرومات 🔒",
-    authors: [{ name: "Ryan" }],
+    authors: [{ name: "10" }],
     settings,
 
     start() {
-        console.log("🛡️ RyanAntiMove شغال");
+        console.log("🛡️ 10AntiMove شغال");
 
-        /* ===== Slash Commands ===== */
+        // Slash Command
         this.registerCommand({
             name: "antimove",
             description: "تشغيل / إيقاف منع السحب",
@@ -78,12 +78,11 @@ export default definePlugin({
             }
         });
 
-        /* ===== Voice Protection ===== */
+        // Voice Protection
         this.addFluxListener("VOICE_STATE_UPDATE", async (p: any) => {
             const myId = UserStore.getCurrentUser()?.id;
             if (!myId || p.userId !== myId) return;
 
-            // حفظ آخر روم
             if (p.channelId) {
                 lastVoiceChannelId = p.channelId;
                 return;
@@ -103,18 +102,18 @@ export default definePlugin({
 
             attempts[executorId] = (attempts[executorId] || 0) + 1;
 
-            /* رجوع فوري */
+            // رجوع فوري
             VoiceActions.selectVoiceChannel(lastVoiceChannelId);
 
-            /* صوت */
+            // صوت
             if (settings.store.notifySound) {
                 new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg").play();
             }
 
-            /* Overlay */
+            // Overlay
             overlay(`🚨 محاولة سحب من <@${executorId}> (${attempts[executorId]})`);
 
-            /* DM لك */
+            // DM لك
             const me = await DMUtils.openPrivateChannel(myId);
             me?.sendMessage?.({
                 content:
@@ -123,7 +122,7 @@ export default definePlugin({
                     `🔢 العدد: ${attempts[executorId]}`
             });
 
-            /* DM له */
+            // DM له
             if (settings.store.autoDM) {
                 const msg =
                     attempts[executorId] >= settings.store.autoBlockAfter
@@ -136,7 +135,7 @@ export default definePlugin({
                 him?.sendMessage?.({ content: msg });
             }
 
-            /* حظر تلقائي */
+            // حظر تلقائي
             if (attempts[executorId] >= settings.store.autoBlockAfter) {
                 RelationshipStore.addRelationship(executorId, 2);
             }
@@ -146,6 +145,6 @@ export default definePlugin({
     },
 
     stop() {
-        console.log("🛑 RyanAntiMove توقف");
+        console.log("🛑 10AntiMove توقف");
     }
 });
